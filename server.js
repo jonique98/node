@@ -1,13 +1,15 @@
 const express = require('express');
 const app = express();
 const bodyparser = require('body-parser')
+const methodOverride = require('method-override')
 app.use(express.urlencoded({extended: true}));
 const mongoURL = 'mongodb+srv://sumin9899:su1214@cluster0.1nanggh.mongodb.net/?retryWrites=true&w=majority'
 app.set('view engine', 'ejs');
 
 const MongoClient = require('mongodb').MongoClient;
 
-app.use
+app.use('/public', express.static('public'));
+app.use(methodOverride('_method'))
 
 var db;
 MongoClient.connect(mongoURL, function(error, client){
@@ -20,11 +22,11 @@ MongoClient.connect(mongoURL, function(error, client){
     });
 
     app.get('/', function(req, res){
-        res.sendFile(__dirname + '/index.html');
+        res.render('index.ejs');
     });
     
     app.get('/write', function(req, res){
-        res.sendFile(__dirname + '/write.html');
+        res.render('write.ejs');
     });
     
     app.post('/add', function(req, res){
@@ -55,12 +57,32 @@ MongoClient.connect(mongoURL, function(error, client){
         console.log(req.body);
         req.body._id =  parseInt(req.body._id);
         db.collection('post').deleteOne(req.body, function(error, result){
-            console.log('삭 완'); 
+            console.log('삭 완');
+            res.status(200).send({message : 'success'});
             db.collection('counter').updateOne({name:'게시물갯수'}, { $inc : {totalPost: -1}}, function(error, result){
                 if (error)
                     return console.log(error);
         })
     })
     })
+
+    app.get('/detail/:id', function(req, res){
+        db.collection('post').findOne({_id : parseInt(req.params.id)}, function(error, result){
+            console.log(result);
+            if (result == null)
+                res.render('detail.ejs', {data : {제목 : '존재 X', 날짜 : '존재 X'}});
+            else
+                res.render('detail.ejs', {data : result})
+        })
+    })
+
+    app.get('/edit/:id', function(req, res){
+        db.collection('post').findOne({_id : parseInt(req.params.id)}, function(error, result){
+            res.render('edit.ejs', {post : result});
+        })
+    })
+
+
+    app.get
 
   })
