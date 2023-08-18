@@ -32,7 +32,6 @@ MongoClient.connect(mongoURL, function(error, client){
     app.post('/add', function(req, res){
         db.collection('counter').findOne({name : '게시물갯수'}, function(error, result){
             var postNum = result.totalPost;
-            
             db.collection('post').insertOne({_id : postNum + 1, 제목 : req.body.title, 날짜 : req.body.date}, function(error, result){
             console.log('저장완료');
             db.collection('counter').updateOne({name:'게시물갯수'}, { $inc : {totalPost:1}}, function(error, result){
@@ -54,7 +53,7 @@ MongoClient.connect(mongoURL, function(error, client){
     }); 
 
     app.delete('/delete', function(req, res){
-        console.log(req.body);
+        console.log(req.body);console.log("이게 바디\n")
         req.body._id =  parseInt(req.body._id);
         db.collection('post').deleteOne(req.body, function(error, result){
             console.log('삭 완');
@@ -82,7 +81,23 @@ MongoClient.connect(mongoURL, function(error, client){
         })
     })
 
+        app.put('/edit', function(req, res){
+        req.body.id =  parseInt(req.body.id);
+        db.collection('post').updateOne({_id : req.body.id}, {$set : {제목 : req.body.title, 날짜 : req.body.date}}, function(error, result){
+            console.log("수정 완");
+            res.redirect('list');
+        })
+    })
 
-    app.get
+    // app.put('/edit', function(req, res){
+    //     id =  parseInt(req.body._id);
+    //     console.log(req.body.title);
+    //     db.collection('post').updateOne({_id : id}, {$set : {제목 : req.body.title, 날짜 : req.body.date}}, function(error, result){
+    //         if (error)
+    //             console.log(error);
+    //         console.log('수정 완');
+    //         res.status(200).send({message : '/list'});
+    //     })
+    // })
 
   })

@@ -32,13 +32,13 @@
     <script>
 
       $('.delete').click(function(e){
-        var num = e.target.dataset.id;
+        var num = $(this).data('id');
         var obj = $(this);
 
           $.ajax({
           method : 'DELETE' ,
           url : '/delete' ,
-          data : {_id : num}
+          data : {_id : num,}
         }).done(function(result){
           console.log('success');
           obj.parent('li').fadeOut();
