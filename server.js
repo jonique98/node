@@ -5,6 +5,7 @@ const methodOverride = require('method-override')
 app.use(express.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 require('dotenv').config();
+const path = require('path');
 
 const MongoClient = require('mongodb').MongoClient;
 
@@ -22,6 +23,9 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
     });
 
     app.get('/', function(req, res){
+      if (req.user)
+        res.render('index.ejs');
+      else
         res.render('login.ejs');
     });
 
@@ -29,7 +33,7 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
       res.render('index');
   });
     
-    app.get('/write', function(req, res){
+    app.get('/write', checkLogin, function(req, res){
         res.render('write.ejs');
     });
     
@@ -45,15 +49,14 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
         });
         req.body.title = "";
         req.body.data = "";
-        res.render('write.ejs');
+        res.redirect('/write');
     });
     });
 
-    app.get('/list', function(req, res){
+    app.get('/list', checkLogin, function(req, res){
         db.collection('post').find().toArray(function(error, result){
             res.render('list.ejs', {posts : result});
         });
-
     }); 
 
     app.get('/search', function(req, res){
@@ -134,7 +137,6 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
   });
 
   app.get('/mypage', checkLogin, function(req, res){
-    console.log(req.user)
     res.render('mypage.ejs', {사용자 : req.user});
   })
 
@@ -142,7 +144,7 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
     if (req.user){
         next();
     }else {
-        res.send('로그인 안하셨는데요..')
+      res.render('loginprompt.ejs')
     }
     
   }

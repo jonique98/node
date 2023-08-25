@@ -33,8 +33,10 @@
         <p>글 번호 : <%= i+1%> </p>
         <h4> 할일 제목 : <%= posts[i].제목 %> </h4>
         <p> 할일 마감날짜 : <%= posts[i].날짜 %> </p>
-        <button class = "btn btn-danger delete" data-id = "<%= posts[i]._id%>">삭제</button>
-      </li>
+        <div>
+          <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>">삭제</button>
+          <a href="/edit/<%= posts[i]._id %>" class="btn btn-primary ml-2">수정</a>
+        </div>
       <% } %>
     </ul>
   </div>
