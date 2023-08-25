@@ -43,18 +43,26 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
                     return console.log(error);
             })
         });
-
-         
+        req.body.title = "";
+        req.body.data = "";
+        res.render('write.ejs');
     });
     });
 
     app.get('/list', function(req, res){
         db.collection('post').find().toArray(function(error, result){
-            console.log(result);
             res.render('list.ejs', {posts : result});
         });
 
     }); 
+
+    app.get('/search', function(req, res){
+      db.collection('post').find({$text: {$search : req.query.value} }).toArray(function(error, result){
+          console.log(result);
+          res.render('search.ejs', {posts : result});
+      });
+
+  }); 
 
     app.delete('/delete', function(req, res){
         console.log(req.body);console.log("이게 바디\n")
