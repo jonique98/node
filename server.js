@@ -30,7 +30,7 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
     });
 
     app.get('/home', function(req, res){
-      res.render('index');
+      res.render('index.ejs');
   });
     
     app.get('/write', checkLogin, function(req, res){
@@ -115,6 +115,14 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
     //     })
     // })
 
+
+  app.get('/search', function(req, res){
+    db.collection('post').find({$text: {$search : req.query.value} }).toArray(function(error, result){
+        console.log(result);
+        res.render('search.ejs', {posts : result});
+    });
+  }); 
+
   })
 
 
@@ -144,7 +152,7 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
     if (req.user){
         next();
     }else {
-      res.render('loginprompt.ejs')
+      res.render('login.ejs')
     }
     
   }
@@ -177,3 +185,15 @@ MongoClient.connect(process.env.mongoURL, function(error, client){
       done(null, result);
     })
   }); 
+
+  app.post('/register', function(req, res){
+    db.collection('login').insertOne( { id : req.body.id, pw : req.body.pw}), function(error, result){
+      if (error)
+        console.log(error);
+      else
+      {
+        console.log("hello\n");
+        res.redirect('/home');
+      }
+    }
+  })
